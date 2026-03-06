@@ -2,7 +2,7 @@
 
 ## Directory Layout
 ```
-hyprink/
+hyprsink/
 ├── src/
 │   ├── lib.rs              # Library root
 │   ├── config.rs           # Config loading
@@ -10,10 +10,10 @@ hyprink/
 │   ├── db.rs               # Store (bincode-based storage)
 │   ├── processor.rs        # Tera rendering
 │   ├── packager.rs         # .pkg archive handling
-│   ├── logger.rs           # hyprlog integration
+│   ├── logger.rs           # hyprslog integration
 │   ├── factory.rs          # Factory patterns
 │   ├── bin/
-│   │   └── hyprink.rs      # Binary entry point
+│   │   └── hyprsink.rs      # Binary entry point
 │   └── cli/
 │       ├── mod.rs          # CLI module root
 │       ├── args.rs         # Clap argument parsing
@@ -48,6 +48,6 @@ hyprink/
 - `ConfigError` - Typed error enum
 
 ## Data Flow
-1. Config: `hyprink.conf` -> `Config::load()` -> binary cache
+1. Config: `hyprsink.conf` -> `Config::load()` -> binary cache
 2. Templates: `.tpl` -> `Template` -> `Store::add()`
 3. Apply: `Store::list()` -> Tera render -> target files -> hooks

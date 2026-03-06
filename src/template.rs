@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
+use wincode::{SchemaRead, SchemaWrite};
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, SchemaWrite, SchemaRead, Clone)]
 pub struct Template {
     #[serde(alias = "package", alias = "meta")]
     pub manifest: TemplateManifest,
@@ -12,7 +13,7 @@ pub struct Template {
     pub hooks: Hooks,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, SchemaWrite, SchemaRead, Clone)]
 pub struct TemplateManifest {
     pub name: String,
     pub version: String,
@@ -24,13 +25,13 @@ pub struct TemplateManifest {
     pub ignored: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, SchemaWrite, SchemaRead, Clone)]
 pub struct Target {
     pub target: String,
     pub content: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Default, Clone)]
+#[derive(Debug, Serialize, Deserialize, SchemaWrite, SchemaRead, Default, Clone)]
 pub struct Hooks {
     pub reload: Option<String>,
 }

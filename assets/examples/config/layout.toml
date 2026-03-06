@@ -28,7 +28,7 @@ file = "{timestamp} {tag} {msg}"
 
 [logging]
 [logging]
-base_dir = "~/.local/state/hyprcore/logs"
+base_dir = "~/.local/state/hyprs/core/logs"
 path_structure = "{year}/{month}/{scope}"
 filename_structure = "{level}.{year}-{month}-{day}.log"
 timestamp_format = "%H:%M:%S"

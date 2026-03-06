@@ -15,7 +15,7 @@ pub fn process_command(cmd: Commands) -> Result<()> {
     let data_dir = config::data_dir();
     let db_path = data_dir.join("store.db");
     let mut db = Store::load(&db_path)?;
-    let config = Config::load().context("Failed to load hyprink config")?;
+    let config = Config::load().context("Failed to load hyprsink config")?;
 
     match cmd {
         Commands::Add { path } => {

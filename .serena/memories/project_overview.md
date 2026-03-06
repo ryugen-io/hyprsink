@@ -1,7 +1,7 @@
-# hyprink Project Overview
+# hyprsink Project Overview
 
 ## Purpose
-hyprink is a system-wide theming tool that unifies configuration across a Linux desktop ecosystem. The core concept is "Single Source of Truth" - edit one central configuration (`~/.config/hypr/hyprink.conf`) and propagate changes to all applications via Tera templates.
+hyprsink is a system-wide theming tool that unifies configuration across a Linux desktop ecosystem. The core concept is "Single Source of Truth" - edit one central configuration (`~/.config/hypr/hyprsink.conf`) and propagate changes to all applications via Tera templates.
 
 ## Tech Stack
 - **Language**: Rust (2021 edition)
@@ -9,14 +9,14 @@ hyprink is a system-wide theming tool that unifies configuration across a Linux 
 - **Template Engine**: Tera
 - **Serialization**: bincode (binary cache), serde
 - **Error Handling**: thiserror (library), anyhow (binary)
-- **Logging**: hyprlog (hl_core)
+- **Logging**: hyprslog (hl_core)
 - **CLI**: Clap
 
 ## Architecture
 
 ### Single Crate Structure
 ```
-hyprink/
+hyprsink/
 ├── src/
 │   ├── lib.rs              # Library root
 │   ├── config.rs           # Config loading
@@ -24,10 +24,10 @@ hyprink/
 │   ├── db.rs               # Store (bincode-based storage)
 │   ├── processor.rs        # Tera rendering
 │   ├── packager.rs         # .pkg archive handling
-│   ├── logger.rs           # hyprlog integration
+│   ├── logger.rs           # hyprslog integration
 │   ├── factory.rs          # Factory patterns
 │   ├── bin/
-│   │   └── hyprink.rs      # Binary entry point
+│   │   └── hyprsink.rs      # Binary entry point
 │   └── cli/
 │       ├── mod.rs          # CLI module root
 │       ├── args.rs         # Clap argument parsing
@@ -40,26 +40,26 @@ hyprink/
 - `cli` - Enables CLI dependencies (clap, tracing, etc.)
 
 ### Key Modules
-- `config` - Config loading from hyprink.conf
+- `config` - Config loading from hyprsink.conf
 - `template` - Template parsing and representation
 - `db` - bincode-based template storage (Store)
 - `processor` - Template rendering with Tera
 - `packager` - .pkg archive handling
-- `logger` - hyprlog integration
+- `logger` - hyprslog integration
 - `factory` - Factory patterns
 
 ## Data Locations
-- Config: `~/.config/hypr/hyprink.conf`
-- Binary cache: `~/.cache/hyprink/config.bin`
-- Data/DB: `~/.local/share/hyprink/`
-- Logs: `~/.local/state/hyprlog/logs/`
-- Lock file: `~/.cache/hyprink/hyprink.lock`
+- Config: `~/.config/hypr/hyprsink.conf`
+- Binary cache: `~/.cache/hyprsink/config.bin`
+- Data/DB: `~/.local/share/hyprsink/`
+- Logs: `~/.local/state/hyprslog/logs/`
+- Lock file: `~/.cache/hyprsink/hyprsink.lock`
 
 ## CLI Commands
-- `hyprink add <path>` - Add template (.tpl) or package (.pkg)
-- `hyprink list` - List stored templates
-- `hyprink list clear` - Remove all templates
-- `hyprink apply` - Apply all templates
-- `hyprink pack <dir>` - Create .pkg archive
-- `hyprink compile` - Pre-compile config to binary cache
-- `hyprink --debug` - Debug viewer
+- `hyprsink add <path>` - Add template (.tpl) or package (.pkg)
+- `hyprsink list` - List stored templates
+- `hyprsink list clear` - Remove all templates
+- `hyprsink apply` - Apply all templates
+- `hyprsink pack <dir>` - Create .pkg archive
+- `hyprsink compile` - Pre-compile config to binary cache
+- `hyprsink --debug` - Debug viewer

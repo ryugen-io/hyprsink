@@ -1,6 +1,6 @@
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
-use hyprink::db::Store;
-use hyprink::template::{Template, TemplateManifest};
+use hyprsink::db::Store;
+use hyprsink::template::{Template, TemplateManifest};
 use tempfile::NamedTempFile;
 
 fn create_dummy_template(id: usize) -> Template {

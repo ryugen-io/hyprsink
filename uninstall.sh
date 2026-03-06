@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# hyprink Uninstall Script
+# hyprsink Uninstall Script
 # Removes binaries, config, data and log directories
 # =============================================================================
 
@@ -12,13 +12,13 @@ shopt -s inherit_errexit 2>/dev/null || true
 # -----------------------------------------------------------------------------
 # Configuration
 # -----------------------------------------------------------------------------
-readonly CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprink.conf"
-readonly CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/hyprink"
-readonly DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/hyprink"
-readonly STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/hyprink"
+readonly CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprs/ink.conf"
+readonly CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/hyprsink"
+readonly DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/hyprsink"
+readonly STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/hyprsink"
 readonly INSTALL_DIR="${HOME}/.local/bin/hypr"
-readonly LIB_DIR="${HOME}/.local/lib/hyprink"
-readonly INCLUDE_DIR="${HOME}/.local/include/hyprink"
+readonly LIB_DIR="${HOME}/.local/lib/hyprsink"
+readonly INCLUDE_DIR="${HOME}/.local/include/hyprsink"
 
 # Colors (Sweet Dracula palette - 24-bit true color)
 readonly GREEN=$'\033[38;2;80;250;123m'
@@ -72,10 +72,10 @@ remove_if_exists() {
 # Main
 # -----------------------------------------------------------------------------
 main() {
-    log "Starting hyprink uninstall"
+    log "Starting hyprsink uninstall"
 
     # Remove binaries
-    remove_if_exists "${INSTALL_DIR}/hyprink" "hyprink binary"
+    remove_if_exists "${INSTALL_DIR}/hyprsink" "hyprsink binary"
 
     # Remove libraries
     remove_if_exists "$LIB_DIR" "library directory"
@@ -88,7 +88,7 @@ main() {
     remove_if_exists "$STATE_DIR" "state directory"
 
     echo ""
-    echo -e "${PURPLE}[hyprink]${NC} ${CHECK}  Uninstall complete"
+    echo -e "${PURPLE}[hyprsink]${NC} ${CHECK}  Uninstall complete"
 }
 
 main "$@"

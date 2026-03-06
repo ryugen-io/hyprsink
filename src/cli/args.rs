@@ -3,17 +3,13 @@ use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(
-    name = "hyprink",
+    name = "hyprsink",
     version,
-    about = "hyprink - System-wide theming manager"
+    about = "hyprsink - System-wide theming manager"
 )]
 pub struct Cli {
     #[command(subcommand)]
     pub command: Option<Commands>,
-
-    /// Enable debug mode with verbose logging in a separate terminal
-    #[arg(long, global = true)]
-    pub debug: bool,
 }
 
 #[derive(Subcommand, Debug)]

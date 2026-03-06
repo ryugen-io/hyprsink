@@ -1,8 +1,8 @@
 use anyhow::{Context, Result, anyhow};
 use clap::{CommandFactory, Parser};
-use hyprink::cli::args::Cli;
-use hyprink::cli::commands;
-use hyprink::cli::logging::{init_logging, spawn_debug_viewer};
+use hyprsink::cli::args::Cli;
+use hyprsink::cli::commands;
+use hyprsink::cli::logging::init_logging;
 use std::env;
 use std::fs;
 use std::os::unix::io::AsRawFd;
@@ -11,13 +11,8 @@ use tracing::{debug, warn};
 fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    // If --debug, spawn hyprdt viewer if needed
-    if cli.debug {
-        spawn_debug_viewer()?;
-    }
-
     // Init Logging
-    let logging_enabled = init_logging(cli.debug)?;
+    init_logging()?;
 
     // Acquire global lock (clients only)
     let _lock_file = match acquire_lock() {
@@ -32,15 +27,11 @@ fn main() -> Result<()> {
     // Handle Commands
     match cli.command {
         None => {
-            if !cli.debug {
-                Cli::command().print_help()?;
-            }
+            Cli::command().print_help()?;
             return Ok(());
         }
         Some(cmd) => {
-            if logging_enabled {
-                debug!("Executing command: {:?}", cmd);
-            }
+            debug!("Executing command: {:?}", cmd);
             commands::process_command(cmd)?;
         }
     }
@@ -59,7 +50,7 @@ fn acquire_lock() -> Result<fs::File> {
         let _ = fs::create_dir_all(&runtime_dir);
     }
 
-    let lock_path = runtime_dir.join("hyprink.lock");
+    let lock_path = runtime_dir.join("hyprsink.lock");
     let file = fs::OpenOptions::new()
         .create(true)
         .write(true)

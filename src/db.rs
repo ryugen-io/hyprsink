@@ -2,8 +2,7 @@ use crate::template::Template;
 use anyhow::{Context, Result};
 use log::debug;
 use std::collections::HashMap;
-use std::fs::{self, File};
-use std::io::{BufReader, BufWriter};
+use std::fs;
 use std::path::{Path, PathBuf};
 
 #[derive(Default)]
@@ -23,15 +22,11 @@ impl Store {
         if path.exists() {
             let len = fs::metadata(path).map(|m| m.len()).unwrap_or(0);
             if len > 0 {
-                let file = File::open(path).context("Failed to open store database")?;
-                let mut reader = BufReader::new(file);
-
-                let data: HashMap<String, Template> =
-                    bincode::serde::decode_from_std_read(&mut reader, bincode::config::standard())
-                        .context("Failed to decode store database")?;
-
-                db.templates = data;
-                debug!("Loaded {} templates", db.templates.len());
+                let bytes = fs::read(path).context("Failed to open store database")?;
+                if let Ok(data) = wincode::deserialize::<HashMap<String, Template>>(&bytes) {
+                    db.templates = data;
+                    debug!("Loaded {} templates", db.templates.len());
+                }
             } else {
                 debug!("Store file is empty");
             }
@@ -46,15 +41,9 @@ impl Store {
         if let Some(parent) = self.path.parent() {
             fs::create_dir_all(parent)?;
         }
-        let file = File::create(&self.path).context("Failed to create store database file")?;
-        let mut writer = BufWriter::new(file);
-
-        bincode::serde::encode_into_std_write(
-            &self.templates,
-            &mut writer,
-            bincode::config::standard(),
-        )
-        .context("Failed to encode store database")?;
+        let encoded =
+            wincode::serialize(&self.templates).context("Failed to encode store database")?;
+        fs::write(&self.path, encoded).context("Failed to create store database file")?;
 
         Ok(())
     }

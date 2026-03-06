@@ -1,13 +1,14 @@
-use criterion::{Criterion, black_box, criterion_group, criterion_main};
-use hyprink::config::Config;
+use criterion::{Criterion, criterion_group, criterion_main};
+use hyprsink::config::Config;
 use std::fs;
+use std::hint::black_box;
 use tempfile::tempdir;
 
 fn benchmark_config_load(c: &mut Criterion) {
     // Setup a dummy config directory
     let dir = tempdir().unwrap();
     let config_dir = dir.path();
-    let conf_path = config_dir.join("hyprink.conf");
+    let conf_path = config_dir.join("hyprsink.conf");
 
     fs::write(
         &conf_path,
@@ -58,7 +59,7 @@ app_name = "benchmark"
 fn benchmark_config_serialization(c: &mut Criterion) {
     let dir = tempdir().unwrap();
     let config_dir = dir.path();
-    let conf_path = config_dir.join("hyprink.conf");
+    let conf_path = config_dir.join("hyprsink.conf");
 
     // Mock config file
     fs::write(

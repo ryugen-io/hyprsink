@@ -1,10 +1,11 @@
+use hyprs_conf::{ConfigMetaSpec, file_matches, resolve_config_path_strict};
 use log::debug;
 use serde::{Deserialize, Serialize};
-use hypr_conf::{ConfigMetaSpec, file_matches, resolve_config_path_strict};
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use thiserror::Error;
+use wincode::{SchemaRead, SchemaWrite};
 
 const TYPE_VALUE: &str = "theme";
 const CONFIG_EXTENSIONS: &[&str] = &["conf"];
@@ -15,7 +16,7 @@ fn config_meta_spec() -> ConfigMetaSpec<'static> {
 
 // === Config Sections ===
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, SchemaWrite, SchemaRead, Clone)]
 pub struct ThemeSection {
     pub name: String,
     pub active_icons: String,
@@ -23,13 +24,13 @@ pub struct ThemeSection {
     pub fonts: HashMap<String, String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, SchemaWrite, SchemaRead, Clone)]
 pub struct IconsSection {
     pub nerdfont: HashMap<String, String>,
     pub ascii: HashMap<String, String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, SchemaWrite, SchemaRead, Clone)]
 pub struct LayoutSection {
     pub tag: TagConfig,
     pub labels: HashMap<String, String>,
@@ -37,7 +38,7 @@ pub struct LayoutSection {
     pub logging: LoggingConfig,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, SchemaWrite, SchemaRead, Clone)]
 pub struct TagConfig {
     pub prefix: String,
     pub suffix: String,
@@ -46,13 +47,13 @@ pub struct TagConfig {
     pub alignment: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, SchemaWrite, SchemaRead, Clone)]
 pub struct StructureConfig {
     pub terminal: String,
     pub file: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, SchemaWrite, SchemaRead, Clone)]
 pub struct LoggingConfig {
     pub base_dir: String,
     pub path_structure: String,
@@ -66,10 +67,10 @@ pub struct LoggingConfig {
 }
 
 fn default_app_name() -> String {
-    "hyprink".to_string()
+    "hyprsink".to_string()
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, SchemaWrite, SchemaRead, Clone)]
 pub struct RetentionConfig {
     #[serde(default = "default_max_age_days")]
     pub max_age_days: u32,
@@ -99,11 +100,38 @@ fn default_compress_after_days() -> Option<u32> {
 
 // === Main Config ===
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
     pub theme: ThemeSection,
     pub icons: IconsSection,
     pub layout: LayoutSection,
+}
+
+#[derive(Debug, SchemaWrite, SchemaRead)]
+struct ConfigCacheWire {
+    theme: ThemeSection,
+    icons: IconsSection,
+    layout: LayoutSection,
+}
+
+impl From<ConfigCacheWire> for Config {
+    fn from(value: ConfigCacheWire) -> Self {
+        Self {
+            theme: value.theme,
+            icons: value.icons,
+            layout: value.layout,
+        }
+    }
+}
+
+impl From<&Config> for ConfigCacheWire {
+    fn from(value: &Config) -> Self {
+        Self {
+            theme: value.theme.clone(),
+            icons: value.icons.clone(),
+            layout: value.layout.clone(),
+        }
+    }
 }
 
 // === Errors ===
@@ -131,7 +159,7 @@ pub fn config_path() -> PathBuf {
                 .map(|h| h.join(".config"))
                 .unwrap_or_else(|| PathBuf::from("/etc"))
         })
-        .join("hypr/hyprink.conf")
+        .join("hypr/hyprs/ink.conf")
 }
 
 pub fn resolve_config_path() -> PathBuf {
@@ -156,14 +184,14 @@ pub fn cache_dir() -> PathBuf {
     std::env::var("XDG_CACHE_HOME")
         .map(PathBuf::from)
         .unwrap_or_else(|_| dirs_next::cache_dir().unwrap_or_else(|| PathBuf::from("/tmp")))
-        .join("hyprink")
+        .join("hyprsink")
 }
 
 pub fn data_dir() -> PathBuf {
     std::env::var("XDG_DATA_HOME")
         .map(PathBuf::from)
         .unwrap_or_else(|_| dirs_next::data_dir().unwrap_or_else(|| PathBuf::from("/tmp")))
-        .join("hyprink")
+        .join("hyprsink")
 }
 
 pub fn cache_file() -> PathBuf {
@@ -217,21 +245,13 @@ impl Config {
         // Try binary cache first
         if !force
             && bin_path.exists()
+            && fs::metadata(bin_path).map(|m| m.len() > 0).unwrap_or(false)
             && Self::is_cache_fresh(bin_path, conf_path)?
-            && let Ok(file) = fs::File::open(bin_path)
+            && let Ok(bytes) = fs::read(bin_path)
         {
-            let mut reader = std::io::BufReader::new(file);
-            match bincode::serde::decode_from_std_read::<Config, _, _>(
-                &mut reader,
-                bincode::config::standard(),
-            ) {
-                Ok(cfg) => {
-                    debug!("Loaded config from cache: {:?}", bin_path);
-                    return Ok(cfg);
-                }
-                Err(e) => {
-                    debug!("Cache decode failed (loading from conf): {}", e);
-                }
+            if let Ok(cfg) = wincode::deserialize::<ConfigCacheWire>(&bytes) {
+                debug!("Loaded config from cache: {:?}", bin_path);
+                return Ok(cfg.into());
             }
         } else {
             debug!("Cache miss or stale, loading from conf");
@@ -249,11 +269,10 @@ impl Config {
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent)?;
         }
-        let file = fs::File::create(path)?;
-        let mut writer = std::io::BufWriter::new(file);
-
-        bincode::serde::encode_into_std_write(self, &mut writer, bincode::config::standard())
-            .map_err(|e| ConfigError::Io(std::io::Error::other(e)))?;
+        let wire = ConfigCacheWire::from(self);
+        let encoded =
+            wincode::serialize(&wire).map_err(|e| ConfigError::Io(std::io::Error::other(e)))?;
+        write_atomic(path, &encoded)?;
 
         debug!("Saved config cache to: {:?}", path);
         Ok(())
@@ -281,9 +300,9 @@ impl Config {
             }
         }
 
-        // Check if any file in hyprink.d is newer
-        let hyprink_d = conf_path.parent().map(|p| p.join("hyprink.d"));
-        if let Some(d) = hyprink_d
+        // Check if any file in hyprsink.d is newer
+        let hyprsink_d = conf_path.parent().map(|p| p.join("hyprsink.d"));
+        if let Some(d) = hyprsink_d
             && d.exists()
             && let Ok(entries) = fs::read_dir(&d)
         {
@@ -302,6 +321,17 @@ impl Config {
 }
 
 fn discover_metadata_config(config_dir: &Path) -> Option<PathBuf> {
-    let fallback = config_dir.join("hyprink.conf");
+    let fallback = config_dir.join("hyprsink.conf");
     resolve_config_path_strict(config_dir, &fallback, &config_meta_spec())
+}
+
+fn write_atomic(path: &Path, bytes: &[u8]) -> Result<(), ConfigError> {
+    let tmp_name = path
+        .file_name()
+        .map(|n| format!(".{}.tmp", n.to_string_lossy()))
+        .unwrap_or_else(|| ".cache.tmp".to_string());
+    let tmp_path = path.with_file_name(tmp_name);
+    fs::write(&tmp_path, bytes)?;
+    fs::rename(&tmp_path, path)?;
+    Ok(())
 }

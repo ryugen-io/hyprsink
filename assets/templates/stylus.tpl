@@ -6,7 +6,7 @@ description = "Global user styles for web browsers"
 license = "MIT"
 
 [[targets]]
-target = "~/.config/hyprcore/generated/stylus/hyprcore.user.css"
+target = "~/.config/hyprs/core/generated/stylus/hyprcore.user.css"
 content = """
 /* ==UserStyle==
 @name           Hyprcore Global
@@ -58,7 +58,7 @@ content = """
 """
 
 [[targets]]
-target = "~/.config/hyprcore/generated/stylus/hyprcore-stylus.json"
+target = "~/.config/hyprs/core/generated/stylus/hyprcore-stylus.json"
 content = """
 [
   {

@@ -59,8 +59,8 @@ just size          # Binary sizes
 just bloat         # Analyze binary bloat
 ```
 
-## hyprink Runtime
+## hyprsink Runtime
 ```bash
-just apply         # Run hyprink apply
-just debug         # Debug hyprink (cargo run)
+just apply         # Run hyprsink apply
+just debug         # Debug hyprsink (cargo run)
 ```

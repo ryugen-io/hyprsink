@@ -7,7 +7,7 @@ license = "MIT"
 
 [[targets]]
 # 1. Generate fast Cache
-target = "~/.local/share/hyprcore/cache/state.json"
+target = "~/.local/share/hyprs/core/cache/state.json"
 content = """
 {
     "colors": { "primary": "{{ colors.primary }}", "error": "{{ colors.error }}" },
@@ -20,7 +20,7 @@ content = """
 target = "~/.local/lib/python3.11/site-packages/hypr.py"
 content = """
 import subprocess, json, os
-CACHE_FILE = os.path.expanduser("~/.local/share/hyprcore/cache/state.json")
+CACHE_FILE = os.path.expanduser("~/.local/share/hyprs/core/cache/state.json")
 
 def get_color(name):
     # Load JSON logic here...

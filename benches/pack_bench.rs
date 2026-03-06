@@ -1,5 +1,5 @@
 use criterion::{Criterion, criterion_group, criterion_main};
-use hyprink::packager::{pack, unpack};
+use hyprsink::packager::{pack, unpack};
 use std::fs;
 use tempfile::tempdir;
 

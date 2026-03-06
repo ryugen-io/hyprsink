@@ -6,7 +6,7 @@ description = "Browser theme generator for Brave/Chrome"
 license = "MIT"
 
 [[targets]]
-target = "~/.config/hyprcore/generated/brave_theme/manifest.json"
+target = "~/.config/hyprs/core/generated/brave_theme/manifest.json"
 content = """
 {
   "manifest_version": 3,
@@ -29,4 +29,4 @@ content = """
 
 [hooks]
 # Optional: could open the folder, but that might be annoying.
-# reload = "xdg-open ~/.config/hyprcore/generated/brave_theme/"
+# reload = "xdg-open ~/.config/hyprs/core/generated/brave_theme/"

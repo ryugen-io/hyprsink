@@ -1,23 +1,23 @@
 use std::sync::OnceLock;
 
-// Re-export types from hyprlog
-pub use hyprlog::{CleanupOptions, CleanupResult, Level, LogStats};
+// Re-export types from hyprslog
+pub use hyprs_log::{CleanupOptions, CleanupResult, Level, LogStats};
 
-static LOGGER: OnceLock<hyprlog::Logger> = OnceLock::new();
+static LOGGER: OnceLock<hyprs_log::Logger> = OnceLock::new();
 
-/// Get the global logger instance, initialized with default settings for hyprink.
-fn get_logger() -> &'static hyprlog::Logger {
+/// Get the global logger instance, initialized with default settings for hyprsink.
+fn get_logger() -> &'static hyprs_log::Logger {
     LOGGER.get_or_init(|| {
-        hyprlog::Logger::builder()
+        hyprs_log::Logger::builder()
             .level(Level::Debug)
             .terminal()
             .colors(true)
             .done()
             .file()
-            .app_name("hyprink")
+            .app_name("hyprsink")
             .done()
             .json()
-            .app_name("hyprink")
+            .app_name("hyprsink")
             .done()
             .build()
     })

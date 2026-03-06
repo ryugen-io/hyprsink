@@ -1,5 +1,6 @@
-use criterion::{Criterion, black_box, criterion_group, criterion_main};
+use criterion::{Criterion, criterion_group, criterion_main};
 use std::collections::HashMap;
+use std::hint::black_box;
 use tera::{Context, Error, Tera, Value};
 
 fn benchmark_tera_render(c: &mut Criterion) {

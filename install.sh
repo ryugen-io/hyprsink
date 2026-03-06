@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2155
 # =============================================================================
-# hyprink Install Script
+# hyprsink Install Script
 # Sets up config directory, creates default configs, and installs binaries
 #
 # Usage:
 #   From source (in repo):  ./install.sh
 #   From release package:   ./install.sh
-#   Remote install:         curl -fsSL https://raw.githubusercontent.com/ryugen-io/hyprink/master/install.sh | bash
+#   Remote install:         curl -fsSL https://raw.githubusercontent.com/ryugen-io/hyprsink/master/install.sh | bash
 #   Specific version:       curl -fsSL ... | bash -s -- v0.2.0
 # =============================================================================
 
@@ -22,12 +22,12 @@ shopt -s inherit_errexit 2>/dev/null || true
 # -----------------------------------------------------------------------------
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo "")"
 readonly CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/hypr"
-readonly CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/hyprink"
-readonly DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/hyprink"
-readonly INSTALL_DIR="${HOME}/.local/bin/hypr"
+readonly CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/hyprs/ink"
+readonly DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/hyprs/ink"
+readonly INSTALL_DIR="${HOME}/.local/bin/hyprs"
 
 # GitHub Release Settings
-readonly REPO="ryugen-io/hyprink"
+readonly REPO="ryugen-io/hyprsink"
 readonly GITHUB_API="https://api.github.com/repos/${REPO}/releases"
 
 # Installation mode: "source", "package", or "remote"
@@ -60,7 +60,7 @@ else
     warn()    { echo -e "${YELLOW}[warn]${NC} INSTALL  $*" >&2; }
     error()   { echo -e "${RED}[error]${NC} INSTALL  $*" >&2; }
     die()     { error "$*"; exit 1; }
-    header()  { echo -e "${PURPLE}[hyprink]${NC} INSTALL  $*"; }
+    header()  { echo -e "${PURPLE}[hyprsink]${NC} INSTALL  $*"; }
 fi
 
 # -----------------------------------------------------------------------------
@@ -95,7 +95,7 @@ detect_install_mode() {
     if [[ -n "$SCRIPT_DIR" && -f "${SCRIPT_DIR}/Cargo.toml" ]]; then
         INSTALL_MODE="source"
     # Running from extracted release package?
-    elif [[ -n "$SCRIPT_DIR" && -d "${SCRIPT_DIR}/bin" && -f "${SCRIPT_DIR}/bin/hyprink" ]]; then
+    elif [[ -n "$SCRIPT_DIR" && -d "${SCRIPT_DIR}/bin" && -f "${SCRIPT_DIR}/bin/hyprsink" ]]; then
         INSTALL_MODE="package"
     # Running via curl | bash (remote)
     else
@@ -118,24 +118,24 @@ get_latest_release() {
 download_release() {
     local version="$1"
     local arch="$2"
-    local url="https://github.com/${REPO}/releases/download/${version}/hyprink-${version}-${arch}.tar.gz"
+    local url="https://github.com/${REPO}/releases/download/${version}/hyprsink-${version}-${arch}.tar.gz"
     local tmp_dir
     tmp_dir="$(mktemp -d)"
 
     log "Downloading ${url}..."
 
     if command_exists curl; then
-        curl -fsSL "$url" -o "${tmp_dir}/hyprink.tar.gz" || die "Download failed"
+        curl -fsSL "$url" -o "${tmp_dir}/hyprsink.tar.gz" || die "Download failed"
     elif command_exists wget; then
-        wget -q "$url" -O "${tmp_dir}/hyprink.tar.gz" || die "Download failed"
+        wget -q "$url" -O "${tmp_dir}/hyprsink.tar.gz" || die "Download failed"
     fi
 
     log "Extracting..."
-    tar -xzf "${tmp_dir}/hyprink.tar.gz" -C "$tmp_dir"
+    tar -xzf "${tmp_dir}/hyprsink.tar.gz" -C "$tmp_dir"
 
     # Find extracted directory
     local pkg_dir
-    pkg_dir="$(find "$tmp_dir" -maxdepth 1 -type d -name 'hyprink-*' | head -1)"
+    pkg_dir="$(find "$tmp_dir" -maxdepth 1 -type d -name 'hyprsink-*' | head -1)"
 
     if [[ -z "$pkg_dir" ]]; then
         die "Failed to extract release package"
@@ -169,12 +169,12 @@ write_config() {
 }
 
 # -----------------------------------------------------------------------------
-# Config Template (single hyprink.conf)
+# Config Template (single hyprsink.conf)
 # -----------------------------------------------------------------------------
 HYPRINK_CONFIG='# hypr metadata
 # type = theme
-# hyprink.conf - Single Source of Truth for system theming
-# Location: ~/.config/hypr/hyprink.conf
+# hyprsink.conf - Single Source of Truth for system theming
+# Location: ~/.config/hypr/hyprs/ink.conf
 
 [theme]
 name = "Sweet Dracula"
@@ -194,7 +194,7 @@ success = "#50FA7B"
 error = "#FF5555"
 warn = "#F1FA8C"
 info = "#8BE9FD"
-hyprink = "#BD93F9"
+hyprsink = "#BD93F9"
 summary = "#50FA7B"
 black = "#44475A"
 red = "#DE312B"
@@ -225,7 +225,7 @@ success = ""
 error = ""
 warn = ""
 info = ""
-hyprink = ""
+hyprsink = ""
 summary = ""
 net = "󰖩"
 
@@ -234,7 +234,7 @@ success = "*"
 error = "!"
 warn = "!!"
 info = "i"
-hyprink = "H"
+hyprsink = "H"
 summary = "="
 net = "#"
 
@@ -257,7 +257,7 @@ terminal = "{tag} {scope} {icon} {msg}"
 file = "{timestamp} {tag} {msg}"
 
 [layout.logging]
-base_dir = "~/.local/state/hyprink/logs"
+base_dir = "~/.local/state/hyprsink/logs"
 path_structure = "{year}/{month}/{scope}"
 filename_structure = "{level}.{year}-{month}-{day}.log"
 timestamp_format = "%H:%M:%S"
@@ -287,7 +287,7 @@ install_from_source() {
     fi
 
     log "Building release binaries..."
-    if ! cargo build --release --bin hyprink 2>&1; then
+    if ! cargo build --release --bin hyprsink 2>&1; then
         die "Build failed"
     fi
     success "Binary build complete"
@@ -295,11 +295,11 @@ install_from_source() {
     # Compact binaries if UPX is available
     if command_exists upx; then
         log "Compacting binaries with UPX..."
-        compact_binary "target/release/hyprink"
+        compact_binary "target/release/hyprsink"
     fi
 
     # Install binaries
-    local src="target/release/hyprink"
+    local src="target/release/hyprsink"
     [[ -f "$src" ]] && cp "$src" "$INSTALL_DIR/" || die "Binary not found: $src"
 }
 
@@ -307,14 +307,15 @@ install_from_package() {
     local pkg_dir="$1"
 
     # Install binaries
-    local src="${pkg_dir}/bin/hyprink"
+    local src="${pkg_dir}/bin/hyprsink"
     [[ -f "$src" ]] && cp "$src" "$INSTALL_DIR/" || die "Binary not found: $src"
-    chmod +x "${INSTALL_DIR}/hyprink"
+    chmod +x "${INSTALL_DIR}/hyprsink"
 
     # Install config from package if it exists
-    if [[ -f "${pkg_dir}/config/hyprink.conf" && ! -f "${CONFIG_DIR}/hyprink.conf" ]]; then
-        cp "${pkg_dir}/config/hyprink.conf" "${CONFIG_DIR}/"
-        success "Created hyprink.conf"
+    if [[ -f "${pkg_dir}/config/hyprsink.conf" && ! -f "${CONFIG_DIR}/hyprs/ink.conf" ]]; then
+        mkdir -p "${CONFIG_DIR}/hyprs"
+        cp "${pkg_dir}/config/hyprsink.conf" "${CONFIG_DIR}/hyprs/ink.conf"
+        success "Created hyprsink.conf"
     fi
 }
 
@@ -334,7 +335,7 @@ install_from_remote() {
         die "Could not determine release version"
     fi
 
-    log "Installing hyprink ${version} for ${arch}"
+    log "Installing hyprsink ${version} for ${arch}"
 
     # Download and extract
     local pkg_dir
@@ -366,7 +367,7 @@ main() {
 
     # Write config file (only in source/remote mode, package mode has its own)
     if [[ "$INSTALL_MODE" != "package" ]]; then
-        write_config "${CONFIG_DIR}/hyprink.conf" "$HYPRINK_CONFIG"
+        write_config "${CONFIG_DIR}/hyprs/ink.conf" "$HYPRINK_CONFIG"
     fi
 
     # Install based on mode
@@ -396,8 +397,8 @@ main() {
     fi
 
     # Show installed version
-    if command_exists "${INSTALL_DIR}/hyprink"; then
-        log "Installed version: $("${INSTALL_DIR}/hyprink" --version 2>/dev/null || echo "unknown")"
+    if command_exists "${INSTALL_DIR}/hyprsink"; then
+        log "Installed version: $("${INSTALL_DIR}/hyprsink" --version 2>/dev/null || echo "unknown")"
     fi
 }
 

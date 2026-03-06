@@ -1,4 +1,4 @@
-# hyprink justfile
+# hyprsink justfile
 
 default: build
 
@@ -122,19 +122,19 @@ tree:
 changes:
     ~/code/.dev/scripts/shared/git/changes.sh
 
-# === hyprink Commands ===
+# === hyprsink Commands ===
 
-# Run hyprink apply
+# Run hyprsink apply
 apply:
-    ./target/release/hyprink apply
+    ./target/release/hyprsink apply
 
 # Add example template
 add-waybar:
-    ./target/release/hyprink add ./assets/templates/waybar.tpl
+    ./target/release/hyprsink add ./assets/templates/waybar.tpl
 
-# Debug hyprink
+# Debug hyprsink
 debug:
-    cargo run --bin hyprink -- --debug
+    cargo run --bin hyprsink -- --debug
 
 # === Examples ===
 

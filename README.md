@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/header.svg" alt="hyprink" />
+  <img src="assets/header.svg" alt="hyprsink" />
 </p>
 
 <p align="center">
@@ -12,25 +12,25 @@
 
 ## Mission
 
-hyprink unifies the theming and configuration of your entire ecosystem (e.g., Hyprland, Waybar, Alacritty). Instead of editing 10 different config files to change a color or font, you edit **one** central configuration. hyprink then propagates these changes to all your installed applications ("Templates") via powerful Tera templates.
+hyprsink unifies the theming and configuration of your entire ecosystem (e.g., Hyprland, Waybar, Alacritty). Instead of editing 10 different config files to change a color or font, you edit **one** central configuration. hyprsink then propagates these changes to all your installed applications ("Templates") via powerful Tera templates.
 
 ## Installation
 
 ### Option A: One-liner (Recommended)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ryugen-io/hyprink/master/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ryugen-io/hyprsink/master/install.sh | bash
 ```
 
 ### Option B: From Source
 ```bash
-git clone https://github.com/ryugen-io/hyprink.git
-cd hyprink
+git clone https://github.com/ryugen-io/hyprsink.git
+cd hyprsink
 just install
 ```
 
 All methods will:
-1. Create `~/.config/hypr/hyprink.conf` with default configuration.
-2. Install binary (`hyprink`) to `~/.local/bin/`.
+1. Create `~/.config/hypr/hyprsink.conf` with default configuration.
+2. Install binary (`hyprsink`) to `~/.local/bin/`.
 
 > Ensure `~/.local/bin` is in your `$PATH`.
 
@@ -41,20 +41,20 @@ All methods will:
 Get up and running in 3 steps:
 
 ```bash
-# 1. Install hyprink
-curl -fsSL https://raw.githubusercontent.com/ryugen-io/hyprink/master/install.sh | bash
+# 1. Install hyprsink
+curl -fsSL https://raw.githubusercontent.com/ryugen-io/hyprsink/master/install.sh | bash
 
 # 2. Add an example template
-hyprink add ./assets/templates/waybar.tpl
+hyprsink add ./assets/templates/hyprsbar.tpl
 
 # 3. Apply all templates
-hyprink apply
+hyprsink apply
 ```
 
 ### Typical Workflow
 
-1. **Edit your config** in `~/.config/hypr/hyprink.conf`
-2. **Run** `hyprink apply` to apply changes
+1. **Edit your config** in `~/.config/hypr/hyprsink.conf`
+2. **Run** `hyprsink apply` to apply changes
 3. **Done!** All configured apps update automatically
 
 ### Creating Your Own Template
@@ -81,8 +81,8 @@ reload = "pkill -USR1 my-app"
 EOF
 
 # Add and apply
-hyprink add my-app.tpl
-hyprink apply
+hyprsink add my-app.tpl
+hyprsink apply
 ```
 
 ---
@@ -93,7 +93,7 @@ hyprink apply
 .
 ├── crates/
 │   ├── hi_core/         # Core Logic (Rust 2024)
-│   └── hi_cli/          # CLI wrapper (`hyprink`)
+│   └── hi_cli/          # CLI wrapper (`hyprsink`)
 ├── assets/
 │   └── templates/       # Example .tpl files
 ├── Cargo.toml           # Workspace config
@@ -103,7 +103,7 @@ hyprink apply
 ### Core Architecture
 
 - **Logic**: `hi_core` (Rust 2024) handles all processing, rendering, and logic.
-- **Storage**: Templates are stored in a high-performance **binary database** located in `~/.local/share/hyprink/`, ensuring instant access and clean storage.
+- **Storage**: Templates are stored in a high-performance **binary database** located in `~/.local/share/hyprsink/`, ensuring instant access and clean storage.
 
 ---
 
@@ -112,77 +112,65 @@ hyprink apply
 ### Template Management
 ```bash
 # Add a single template or .pkg package
-hyprink add ./assets/templates/waybar.tpl
-hyprink add ./my-theme.pkg
+hyprsink add ./assets/templates/hyprsbar.tpl
+hyprsink add ./my-theme.pkg
 
 # List all stored templates
-hyprink list
+hyprsink list
 
 # Apply all templates to the system
-hyprink apply
+hyprsink apply
 
 # Clear all templates from store
-hyprink list clear
+hyprsink list clear
 
 # Enable/Disable templates
-hyprink list disable waybar-theme
-hyprink list enable waybar-theme
+hyprsink list disable hyprsbar
+hyprsink list enable hyprsbar
 ```
 
 ### Packaging
 ```bash
 # Pack multiple .tpl files into a portable .pkg package
-hyprink pack ./my-templates/
+hyprsink pack ./my-templates/
 
 # Specify custom output path
-hyprink pack ./my-templates/ --output ./my-theme.pkg
+hyprsink pack ./my-templates/ --output ./my-theme.pkg
 ```
 
 ### Performance Optimization
 ```bash
 # Pre-compile config file into binary format for faster startup
-hyprink compile
+hyprsink compile
 ```
 
-> Run `hyprink compile` after changing your configuration file to cache it for instant loading.
+> Run `hyprsink compile` after changing your configuration file to cache it for instant loading.
 
 ---
 
 ## Debugging
 
-hyprink includes a powerful debug mode to diagnose failing hooks or configuration issues.
+Use standard Rust log filters to get verbose output:
 
 ```bash
-hyprink --debug
-```
-
-This will spawn a **separate terminal window** that streams verbose logs, including:
-- Exact commands executed by hooks
-- Stdout/Stderr from hooks
-- Configuration files loaded
-- Tera template context keys
-
-You can also attach it to specific commands:
-```bash
-hyprink apply --debug
-hyprink compile --debug
+RUST_LOG=debug hyprsink apply
+RUST_LOG=debug hyprsink compile
 ```
 
 ---
 
 ## Robustness
 
-hyprink enforces a **Single Instance Policy** using OS-level file locking (`flock`). This ensures that only one instance manages the store or system configuration at a time, preventing database corruption and conflicts.
+hyprsink enforces a **Single Instance Policy** using OS-level file locking (`flock`). This ensures that only one instance manages the store or system configuration at a time, preventing database corruption and conflicts.
 
-- **Automatic Cleanup**: If hyprink crashes, the kernel releases the lock immediately.
+- **Automatic Cleanup**: If hyprsink crashes, the kernel releases the lock immediately.
 - **Non-Blocking**: A second instance will fail immediately with a clear error message instead of hanging.
-- **Debug Exception**: The debug viewer (`hyprink --debug`) is exempt and can run in parallel.
 
 ---
 
 ## Templates (`.tpl`)
 
-A **Template** is a single TOML file that teaches hyprink how to theme a specific application. Templates are stored in the database upon installation.
+A **Template** is a single TOML file that teaches hyprsink how to theme a specific application. Templates are stored in the database upon installation.
 
 ### Structure
 ```toml
@@ -230,7 +218,7 @@ A **Package** is a portable zip archive containing multiple `.tpl` files. Use pa
 ### Creating a Package
 ```bash
 # Package all .tpl files from a directory
-hyprink pack ./my-theme-templates/
+hyprsink pack ./my-theme-templates/
 
 # Creates: my-theme-templates.pkg
 ```
@@ -238,7 +226,7 @@ hyprink pack ./my-theme-templates/
 ### Installing a Package
 ```bash
 # Extract and add all templates from a package
-hyprink add ./my-theme.pkg
+hyprsink add ./my-theme.pkg
 ```
 
 > Packages are simply ZIP files with a `.pkg` extension. You can inspect their contents with any archive tool.
@@ -250,7 +238,7 @@ hyprink add ./my-theme.pkg
 Templates use the [Tera](https://keats.github.io/tera/) templating engine. The following variables are available:
 
 ### Colors (`colors.*`)
-All colors defined in `hyprink.conf`:
+All colors defined in `hyprsink.conf`:
 ```
 {{ colors.bg }}         -> #161925
 {{ colors.fg }}         -> #F8F8F2
@@ -271,7 +259,7 @@ All colors defined in `hyprink.conf`:
 ```
 
 ### Icons (`icons.*`)
-Icons from the active icon set (configured in `hyprink.conf`):
+Icons from the active icon set (configured in `hyprsink.conf`):
 ```
 {{ icons.success }}     ->  (or * in ASCII mode)
 {{ icons.error }}       ->  (or ! in ASCII mode)
@@ -284,9 +272,9 @@ Icons from the active icon set (configured in `hyprink.conf`):
 
 ## Configuration
 
-Located at `~/.config/hypr/hyprink.conf` - a single file containing all settings.
+Located at `~/.config/hypr/hyprsink.conf` - a single file containing all settings.
 
-### Example hyprink.conf
+### Example hyprsink.conf
 ```toml
 [theme]
 name = "Sweet Dracula"
@@ -326,7 +314,7 @@ terminal = "{tag} {scope} {icon} {msg}"
 file = "{timestamp} {tag} {msg}"
 
 [layout.logging]
-base_dir = "~/.local/state/hyprink/logs"
+base_dir = "~/.local/state/hyprsink/logs"
 path_structure = "{year}/{month}/{scope}"
 filename_structure = "{level}.{year}-{month}-{day}.log"
 write_by_default = true
